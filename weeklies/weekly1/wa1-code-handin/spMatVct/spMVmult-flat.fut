@@ -7,6 +7,8 @@
 --   [2.0f32, 1.0f32, 0.0f32, 3.0f32]
 -- }
 -- output { [3.0f32, 0.0f32, -4.0f32, 6.0f32, 9.0f32] }
+-- compiled input @ bigTest.in
+-- output @ bigTest.out
 
 ------------------------
 --- Sgm Scan Helpers ---
@@ -122,34 +124,15 @@ let spMatVctMult [num_elms][vct_len][num_rows]
                  (mat_shp: [num_rows]i64)
                  (vct: [vct_len]f32)
                    : [num_rows]f32 =
-  --- map (\ row ->                                 ---
-  ---         let prods =                           ---
-  ---               map (\(i,x) -> x*vct[i]) row    ---
-  ---         in  reduce (+) 0 prods                ---
-  ---     ) mat   
-  -- BECOMES
-  --- let prods map (\(i,x) ->  x*vct[i]) row in
-  --- F(map (\ row -> reduce (+) 0 prods) mat) BECOMES what is given on page 56 of the Lecture notes.
-  --
-  let prods    = map (\(i,x) -> x*vct[i]) mat_val
   let mat_flg' = mkFlagArray mat_shp (false) (replicate num_rows true)
-  -- let mkFlagArray 't [m]
-  --           (aoa_shp: [m]i64) (zero: t)
-  --           (aoa_val: [m]t  ) : []t   = 
   let mat_flg  = mat_flg' :> [num_elms]bool
+  let prods    = map (\(i,x) -> x*vct[i]) mat_val
   let sc_mat   = sgmSumF32 mat_flg prods
   let indsp1   = scan (+) 0 mat_shp
   let res = map2 (\shp ip1 -> if shp==0 then 0
                               else sc_mat[ip1-1]
                 ) mat_shp indsp1
   in res
-
-  -- TODO: fill in your implementation here.
-  --       for now, the function simply returns zeroes.
-
-  -- let shp_sc = scan (+) 0 mat_shp
-  -- in replicate num_rows 0.0f32
-
 
 -- One may run with for example:
 -- $ futhark dataset --i64-bounds=0:9999 -g [1000000]i64 --f32-bounds=-7.0:7.0 -g [1000000]f32 --i64-bounds=100:100 -g [10000]i64 --f32-bounds=-10.0:10.0 -g [10000]f32 | ./spMVmult-seq -t /dev/stderr -n
@@ -162,30 +145,3 @@ let main [n][m]
          (vct: []f32)
            : [m]f32 =
   spMatVctMult (zip mat_inds mat_vals) shp vct
-
--- KACHING
--- [sxd682@hendrixfut03fl spMatVct]$ futhark cuda spMVmult-seq.fut
--- [sxd682@hendrixfut03fl spMatVct]$ futhark dataset --i64-bounds=0:9999 -g '[1000000]i64' --f32-bounds=-7.0:7.0 -g '[1000000]f32' --i64-bounds=100:100 -g '[10000]i64' --f32-bounds=-10.0:10.0 -g '[10000]f32' | ./spMVmult-seq -t /dev/stderr -r 10 -n
--- 296200
--- 296196
--- 296197
--- 296251
--- 296255
--- 296241
--- 296277
--- 296149
--- 296233
--- 296249
--- [sxd682@hendrixfut03fl spMatVct]$ futhark cuda spMVmult-flat.fut
--- [sxd682@hendrixfut03fl spMatVct]$ futhark dataset --i64-bounds=0:9999 -g '[1000000]i64' --f32-bounds=-7.0:7.0 -g '[1000000]f32' --i64-bounds=100:100 -g '[10000]i64' --f32-bounds=-10.0:10.0 -g '[10000]f32' | ./spMVmult-flat -t /dev/stderr -r 10 -n
--- 190
--- 187
--- 187
--- 185
--- 186
--- 196
--- 181
--- 180
--- 181
--- 182
--- [sxd682@hendrixfut03fl spMatVct]$
