@@ -30,6 +30,8 @@
 -- compiled input @ test_data/lssp-zeros-data-large-interval-small.in
 -- compiled input @ test_data/lssp-zeros-data-small-interval-large.in
 -- compiled input @ test_data/lssp-zeros-data-large-interval-large.in
+-- compiled input @ test_data/lssp-zeros-data-small-interval-very-large.in
+-- compiled input @ test_data/lssp-zeros-data-large-interval-very-large.in
 
 -- INPUTS:
 -- futhark dataset --i32-bounds=-1:1 -b -g '[64000]i32' > test_data/lssp-zeros-data-small-interval-small.in
@@ -56,6 +58,8 @@ entry main (xs: []int) : int =
 -- compiled input @ test_data/lssp-zeros-data-large-interval-small.in
 -- compiled input @ test_data/lssp-zeros-data-small-interval-large.in
 -- compiled input @ test_data/lssp-zeros-data-large-interval-large.in
+-- compiled input @ test_data/lssp-zeros-data-small-interval-very-large.in
+-- compiled input @ test_data/lssp-zeros-data-large-interval-very-large.in
 entry mainSeq (xs: []int) : int =
   let pred1 x   = (x == 0)
   let pred2 x y = (x == 0) && (y == 0) in
