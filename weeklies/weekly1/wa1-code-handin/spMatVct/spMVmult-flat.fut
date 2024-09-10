@@ -162,3 +162,30 @@ let main [n][m]
          (vct: []f32)
            : [m]f32 =
   spMatVctMult (zip mat_inds mat_vals) shp vct
+
+-- KACHING
+-- [sxd682@hendrixfut03fl spMatVct]$ futhark cuda spMVmult-seq.fut
+-- [sxd682@hendrixfut03fl spMatVct]$ futhark dataset --i64-bounds=0:9999 -g '[1000000]i64' --f32-bounds=-7.0:7.0 -g '[1000000]f32' --i64-bounds=100:100 -g '[10000]i64' --f32-bounds=-10.0:10.0 -g '[10000]f32' | ./spMVmult-seq -t /dev/stderr -r 10 -n
+-- 296200
+-- 296196
+-- 296197
+-- 296251
+-- 296255
+-- 296241
+-- 296277
+-- 296149
+-- 296233
+-- 296249
+-- [sxd682@hendrixfut03fl spMatVct]$ futhark cuda spMVmult-flat.fut
+-- [sxd682@hendrixfut03fl spMatVct]$ futhark dataset --i64-bounds=0:9999 -g '[1000000]i64' --f32-bounds=-7.0:7.0 -g '[1000000]f32' --i64-bounds=100:100 -g '[10000]i64' --f32-bounds=-10.0:10.0 -g '[10000]f32' | ./spMVmult-flat -t /dev/stderr -r 10 -n
+-- 190
+-- 187
+-- 187
+-- 185
+-- 186
+-- 196
+-- 181
+-- 180
+-- 181
+-- 182
+-- [sxd682@hendrixfut03fl spMatVct]$

@@ -1,0 +1,5 @@
+*.c
+*.actual
+*.expected
+*.in
+*.DS_STORE
