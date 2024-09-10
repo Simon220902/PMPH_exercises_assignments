@@ -18,10 +18,10 @@ let spMatVctMult [vct_len][num_rows]
   let offset = 0i64
   -- semantically this is a map over rows
   let (res, _) =
-  loop (res, offset) for i < num_rows do
+  loop (res, offset) for i < num_rows do -- This runs through each row
     let row_len = shp[i]
     let sum =
-    loop sum = 0.0f32 for j < row_len do
+      loop sum = 0.0f32 for j < row_len do
         sum + vals[offset + j] * vct[inds[offset + j]]
     let res[i] = sum
     let offset = offset + row_len
