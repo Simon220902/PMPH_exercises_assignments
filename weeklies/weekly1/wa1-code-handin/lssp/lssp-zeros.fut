@@ -30,6 +30,7 @@
 -- compiled input @ test_data/lssp-zeros-data-large-interval-small.in
 -- compiled input @ test_data/lssp-zeros-data-small-interval-large.in
 -- compiled input @ test_data/lssp-zeros-data-large-interval-large.in
+-- output @ test_data/lssp-zeros-data-large-interval-large.out
 -- compiled input @ test_data/lssp-zeros-data-small-interval-very-large.in
 -- compiled input @ test_data/lssp-zeros-data-large-interval-very-large.in
 
@@ -58,6 +59,7 @@ entry main (xs: []int) : int =
 -- compiled input @ test_data/lssp-zeros-data-large-interval-small.in
 -- compiled input @ test_data/lssp-zeros-data-small-interval-large.in
 -- compiled input @ test_data/lssp-zeros-data-large-interval-large.in
+-- output @ test_data/lssp-zeros-data-large-interval-large.out
 -- compiled input @ test_data/lssp-zeros-data-small-interval-very-large.in
 -- compiled input @ test_data/lssp-zeros-data-large-interval-very-large.in
 entry mainSeq (xs: []int) : int =

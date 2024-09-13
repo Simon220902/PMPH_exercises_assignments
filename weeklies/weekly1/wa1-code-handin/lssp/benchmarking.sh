@@ -17,7 +17,6 @@ echo "GENERATING: data for lssp-sorted.fut and lssp-same.fut"
 
 
 echo "BENCHMARKING: lssp-zero"
-# for backend in "c"; do # "cuda"; do
 for backend in "c" "cuda"; do
     for entry in "main"; do
         echo "RUNNING: futhark bench --backend=$backend lssp-zeros.fut -e $entry"
@@ -33,7 +32,6 @@ for backend in "c" "cuda"; do
 done
 
 echo "BENCHMARKING: lssp-sorted"
-# for backend in "c"; do # "cuda"; do
 for backend in "c" "cuda"; do
     for entry in "main"; do
         echo -e "\nRUNNING: futhark bench --backend=$backend lssp-sorted.fut -e $entry"
@@ -49,7 +47,6 @@ for backend in "c" "cuda"; do
 done
 
 echo "BENCHMARKING: lssp-same"
-# for backend in "c"; do # "cuda"; do
 for backend in "c" "cuda"; do
     for entry in "main"; do
         echo -e "\nRUNNING: futhark bench --backend=$backend lssp-same.fut -e $entry"

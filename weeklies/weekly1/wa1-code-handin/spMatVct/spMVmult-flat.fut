@@ -13,6 +13,7 @@
 
 -- Test set generated with:
 -- $ futhark dataset --i64-bounds=0:99 -g '[1000]i64' --f32-bounds=-7.0:7.0 -g '[1000]f32' --i64-bounds=10:10 -g '[100]i64' --f32-bounds=-10.0:10.0 -g '[100]f32' > spMVtest.in 
+-- $ futhark c spMVmult-seq.fut
 -- $ ./spMVmult-seq < spMVtest.in > spMVtest.out
 
 ------------------------
