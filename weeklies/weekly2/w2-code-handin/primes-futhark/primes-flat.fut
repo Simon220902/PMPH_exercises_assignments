@@ -32,7 +32,7 @@ let segmented_scan [n] 't (op: t -> t -> t) (ne: t)
 
 
 let flatten_map_iota [len] (ns : [len]i64)   =
-  let reps = (replicate len true) :> [len]bool in
+  let reps = (replicate len true) :> [len]bool
   let flag = mkFlagArray ns false reps
   let vals = map (\f -> if f then 0i64 else 1i64) flag
   in segmented_scan (+) 0 flag vals
@@ -111,11 +111,11 @@ let primesFlat (n : i64) : []i64 =
       -- where the map then simply becomes
       -- let not_primes = map2 (\ p j -> j * p) prim_adjusted sq_primes_replicated
       
-      let sq_primes_replicated = flatten_map_replicate mult_lens sq_primes
-      let sq_primes_replicated' = sq_primes_replicated :> [flat_size]i64
-      let prim_adjusted = map (+2) (flatten_map_iota mult_lens)
-      let prim_adjusted' = prim_adjusted :> [flat_size]i64
-      let not_primes = map2 (\ p j -> j * p) prim_adjusted' sq_primes_replicated'
+      let sq_primes_replicated = (flatten_map_replicate mult_lens sq_primes) :> [flat_size]i64
+      -- let sq_primes_replicated' = sq_primes_replicated :> [flat_size]i64
+      let prim_adjusted = map (+2) (flatten_map_iota mult_lens) :> [flat_size]i64
+      -- let prim_adjusted' = prim_adjusted :> [flat_size]i64
+      let not_primes = map2 (\ p j -> j * p) prim_adjusted sq_primes_replicated
 
 
       -- let not_primes = replicate flat_size 0
