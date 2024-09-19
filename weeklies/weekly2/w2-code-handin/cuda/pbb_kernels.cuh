@@ -1,6 +1,9 @@
 #ifndef PBB_KERNELS
 #define PBB_KERNELS
 
+#define TASK2 0
+#define TASK3 1
+
 #include <cuda_runtime.h>
 
 /**
@@ -179,15 +182,26 @@ class Mssp {
 template<class OP>
 __device__ inline typename OP::RedElTp
 scanIncWarp( volatile typename OP::RedElTp* ptr, const unsigned int idx ) {
-    const unsigned int lane = idx & (WARP-1);
-
-    if(lane==0) {
+    #if TASK3
+        int i = threadIdx.x & (WARP - 1); // threadIdx.x % WARP
         #pragma unroll
-        for(int i=1; i<WARP; i++) {
-            ptr[idx+i] = OP::apply(ptr[idx+i-1], ptr[idx+i]);
+        for (int d = 0; d < lgWARP; d++) {
+            int h = 1 << d; // 2^d
+            if (i >= h) {
+                ptr[idx] = OP::apply(ptr[idx-h], ptr[idx]);
+            }
         }
-    }
-    return OP::remVolatile(ptr[idx]);
+        return OP::remVolatile(ptr[idx]);
+    #else
+        const unsigned int lane = idx & (WARP-1); // idx % WARP
+        if(lane==0) {
+            #pragma unroll
+            for(int i=1; i<WARP; i++) {
+                ptr[idx+i] = OP::apply(ptr[idx+i-1], ptr[idx+i]);
+            }
+        }
+        return OP::remVolatile(ptr[idx]);
+    #endif
 }
 
 /**
@@ -218,7 +232,12 @@ scanIncBlock(volatile typename OP::RedElTp* ptr, const unsigned int idx) {
     //   the first warp. This works because
     //   warp size = 32, and
     //   max block size = 32^2 = 1024
-    if (lane == (WARP-1)) { ptr[warpid] = OP::remVolatile(ptr[idx]); }
+    // if (lane == (WARP-1)) { ptr[warpid] = OP::remVolatile(ptr[idx]); } // This will fail because different warps will run out-of sync and therefore there is a race condition.
+    typename OP::RedElTp end = OP::remVolatile(ptr[idx]);
+    __syncthreads(); // This needs to be outside the if-statement otherwise not all threads will enter it.
+    if (lane == (WARP-1)) {
+        ptr[warpid] = end;
+    }
     __syncthreads();
 
     // 3. scan again the first warp.
@@ -436,7 +455,11 @@ copyFromGlb2ShrMem( const uint32_t glb_offs
 ) {
     #pragma unroll
     for(uint32_t i=0; i<CHUNK; i++) {
-        uint32_t loc_ind = threadIdx.x*CHUNK + i;
+        #if TASK2
+            uint32_t loc_ind = i * blockDim.x + threadIdx.x;
+        #else
+            uint32_t loc_ind = threadIdx.x * CHUNK + i;
+        #endif
         uint32_t glb_ind = glb_offs + loc_ind;
         T elm = ne;
         if(glb_ind < N) { elm = d_inp[glb_ind]; }
@@ -466,7 +489,12 @@ copyFromShr2GlbMem( const uint32_t glb_offs
 ) {
     #pragma unroll
     for (uint32_t i = 0; i < CHUNK; i++) {
-        uint32_t loc_ind = threadIdx.x * CHUNK + i;
+        #if TASK2
+            uint32_t loc_ind = i * blockDim.x + threadIdx.x;
+        #else
+            uint32_t loc_ind = threadIdx.x * CHUNK + i;
+        #endif
+        
         uint32_t glb_ind = glb_offs + loc_ind;
         if (glb_ind < N) {
             T elm = const_cast<const T&>(shmem_red[loc_ind]);

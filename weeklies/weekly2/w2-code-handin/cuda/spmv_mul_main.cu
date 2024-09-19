@@ -152,9 +152,9 @@ int SparseMatVctMult(int block_size, int mat_rows, int vct_size) {
         // The total number of non-zero elements in the matrix is `tot_size`.
         // The number of rows in the matrix is `mat_rows`.
         // The block size of the CUDA block is `block_size`
-        unsigned int num_blocks     = 1;  // TODO: replace this dummy value.
-        unsigned int num_blocks_shp = 1;  // TODO: replace this dummy value.
-
+        unsigned int num_blocks     = (tot_size+block_size-1) / block_size ;
+        unsigned int num_blocks_shp = (mat_rows+block_size-1) / block_size;
+        
         { // copy-in stage
             cudaMemcpy(mat_shp_d,  rands,    mat_rows*sizeof(int),   cudaMemcpyHostToDevice);
             cudaMemcpy(mat_inds_d, mat_inds, tot_size*sizeof(int),   cudaMemcpyHostToDevice);
@@ -212,6 +212,7 @@ int SparseMatVctMult(int block_size, int mat_rows, int vct_size) {
         timeval_subtract(&t_diff, &t_end, &t_start);
         elapsed = (t_diff.tv_sec*1e6+t_diff.tv_usec) / RUNS_GPU;
         printf("GPU Sparse Matrix-Vector Multiplication runs in: %lu microsecs\n", elapsed);
+        
 
         { // copy out stage:
             CUDASSERT(cudaMemcpy(vct_res2, res_vct_d, mat_rows*sizeof(float),
